@@ -70,9 +70,10 @@ public class AuthController {
         Role roles = roleRepository.findByName("ROLE_ADMIN").get();
         user.setRoles(Collections.singleton(roles));
 
-        userRepository.save(user);
+        User saveduser = userRepository.save(user);
 
-        return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
+        // return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
+        return ResponseEntity.ok(saveduser);
 
     }
 }
