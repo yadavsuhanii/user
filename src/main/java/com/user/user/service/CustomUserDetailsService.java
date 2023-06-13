@@ -1,4 +1,5 @@
 package com.user.user.service;
+// import com.user.user.service.EmailService;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +19,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private UserRepository userRepository;
 
+    // private EmailService emailService;
+
+
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -27,14 +31,24 @@ public class CustomUserDetailsService implements UserDetailsService {
           User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                  .orElseThrow(() ->
                          new UsernameNotFoundException("User not found with username or email: "+ usernameOrEmail));
-
+                         
         Set<GrantedAuthority> authorities = user
                 .getRoles()
                 .stream()
                 .map((role) -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toSet());
 
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),
+                return new org.springframework.security.core.userdetails.User(user.getEmail(),
                 user.getPassword(),
                 authorities);
+                
+        // UserDetails userDetails =  new org.springframework.security.core.userdetails.User(user.getEmail(),
+        //         user.getPassword(),
+        //         authorities);
+        //         System.out.println(userDetails);
+        //         emailService.generateAndSendOTP(userDetails.getUsername());
+               
+
+                // return userDetails;
+
     }
 }

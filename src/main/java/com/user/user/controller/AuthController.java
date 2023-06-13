@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.user.user.dto.LoginDto;
@@ -39,21 +40,26 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/signin")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto){
+    @ResponseStatus(value = HttpStatus.OK)
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginDto loginDto){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        // System.out.println(authentication);
         return new ResponseEntity<>("User signed-in successfully!.", HttpStatus.OK);
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignUpDto signUpDto){
 
+        System.out.println(signUpDto);
+
         // add check for username exists in a DB
         if(userRepository.existsByUsername(signUpDto.getUserName())){
             return new ResponseEntity<>("Username is already taken!", HttpStatus.BAD_REQUEST);
         }
+        System.out.println(signUpDto.getUserName());
 
         // add check for email exists in DB
         if(userRepository.existsByEmail(signUpDto.getEmail())){
@@ -69,11 +75,14 @@ public class AuthController {
 
         Role roles = roleRepository.findByName("ROLE_ADMIN").get();
         user.setRoles(Collections.singleton(roles));
+        System.out.println(user);
 
         User saveduser = userRepository.save(user);
-
-        // return new ResponseEntity<>("User registered successfully", HttpStatus.OK);
         return ResponseEntity.ok(saveduser);
+
+
+
+        
 
     }
 }
